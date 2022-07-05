@@ -5,7 +5,7 @@
     "prepare": {
       "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "command": "cp ./target/wasm32-wasi/release/acmi_parser.wasm ./apps/api/acmi_parser.wasm"
+        "command": "cp ./target/wasm32-wasi/release/acmi_parser.wasm ./apps/api/acmi_parser.wasm && cd ./apps/api && ./pre.sh"
       },
       "outputs": [
         "apps/api/acmi_parser.wasm"

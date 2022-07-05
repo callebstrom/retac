@@ -5,7 +5,7 @@
   "scripts": {
     "start": "nx affected --target=dev",
     "build": "nx run-many --target=build --projects=api --verbose",
-    "pre-commit": "nx run-many --target=\"prepare\" --projects=api,acmi-parser",
+    "pre-commit": "nx run-many --target=prepare --projects=api",
     "test": "nx run-many --target=test --all",
     "prepare": "husky install"
   },
