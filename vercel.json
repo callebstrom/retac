@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "apps/api/parse.js": {
+      "includeFiles": "apps/api/**"
+    }
+  }
+}
