@@ -12,7 +12,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
+    fn should_unzip_acmi_file() {
         let file = "F15_SU27_BVR.zip.acmi";
         assert_eq!(acmi_parser(file)[3..21], "FileType=text/acmi".to_string());
     }
