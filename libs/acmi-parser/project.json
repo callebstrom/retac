@@ -5,7 +5,11 @@
   "targets": {
     "build": {
       "executor": "@nxrs/cargo:build",
-      "options": {}
+      "options": {
+        "release": true,
+        "target": "wasm32-wasi",
+        "lib": true
+      }
     },
     "test": {
       "executor": "@nxrs/cargo:test",

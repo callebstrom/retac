@@ -1,6 +1,6 @@
 mod zip;
 
-pub fn acmi_parser(file: &str) -> String {
+pub fn parse(file: &str) -> String {
     match zip::unzip(file) {
         Ok(res) => res,
         Err(err) => err.to_string(),
@@ -14,6 +14,6 @@ mod tests {
     #[test]
     fn should_unzip_acmi_file() {
         let file = "F15_SU27_BVR.zip.acmi";
-        assert_eq!(acmi_parser(file)[3..21], "FileType=text/acmi".to_string());
+        assert_eq!(parse(file)[3..21], "FileType=text/acmi".to_string());
     }
 }
