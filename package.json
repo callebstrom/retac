@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "vercel dev",
-    "build": "nx run-many --target=build --projects=api --verbose",
+    "dev": "nx run-many --target=dev --projects=web",
+    "build": "nx run-many --target=build --projects=api",
     "pre-commit": "nx run-many --target=prepare --projects=api",
     "test": "nx run-many --target=test --all",
     "prepare": "husky install"

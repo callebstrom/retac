@@ -10,6 +10,12 @@
       "outputs": [
         "dist"
       ]
+    },
+    "dev": {
+      "executor": "nx:run-script",
+      "options": {
+        "script": "dev"
+      }
     }
   },
   "tags": []
