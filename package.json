@@ -4,14 +4,13 @@
   "license": "MIT",
   "scripts": {
     "start": "nx affected --target=dev",
-    "build": "nx run-many --target=build --all",
-    "test": "nx run-many --target=test --all"
+    "build": "nx run-many --target=build --projects=api",
+    "pre-commit": "nx run-many --target=\"prepare\" --projects=api,acmi-parser",
+    "test": "nx run-many --target=test --all",
+    "prepare": "husky install"
   },
   "private": true,
-  "dependencies": {
-  },
   "devDependencies": {
-    "tslib": "^2.3.0",
     "@nrwl/cli": "14.4.2",
     "@nrwl/cypress": "14.4.2",
     "@nrwl/eslint-plugin-nx": "14.4.2",
@@ -19,8 +18,8 @@
     "@nrwl/linter": "14.4.2",
     "@nrwl/nx-cloud": "latest",
     "@nrwl/workspace": "14.4.2",
-    "@nxrs/cargo": "^0.3.3",
     "@nxext/svelte": "^14.0.0",
+    "@nxrs/cargo": "^0.3.3",
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.41",
     "@testing-library/svelte": "^3.1.1",
     "@tsconfig/svelte": "^3.0.0",
@@ -34,6 +33,7 @@
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-cypress": "^2.10.3",
     "eslint-plugin-svelte3": "^3.4.1",
+    "husky": "^8.0.1",
     "jest": "27.5.1",
     "nx": "14.4.2",
     "prettier": "^2.6.2",
@@ -43,6 +43,7 @@
     "svelte-preprocess": "^4.10.6",
     "ts-jest": "27.1.4",
     "ts-node": "~10.8.0",
+    "tslib": "^2.3.0",
     "typescript": "~4.7.2",
     "vitest": "^0.9.3"
   }

@@ -1,8 +1,6 @@
 {
   "private": true,
   "type": "module",
-  "scripts": {
-  },
   "dependencies": {
     "vercel": "^26.0.0"
   }

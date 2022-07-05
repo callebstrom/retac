@@ -2,12 +2,24 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "app",
   "targets": {
-    "build": {
+    "prepare": {
       "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "command": "cp ./target/wasm32-wasi/release/acmi_parser.wasm ./apps/api/acmi_parser.wasm && cd ./apps/api && ./pre.sh"
-      }
+        "command": "cp ./target/wasm32-wasi/release/acmi_parser.wasm ./apps/api/acmi_parser.wasm"
+      },
+      "outputs": [
+        "apps/api/acmi_parser.wasm"
+      ],
+      "dependsOn": [
+        {
+          "target": "build",
+          "projects": "dependencies"
+        }
+      ]
     }
   },
+  "implicitDependencies": [
+    "acmi-parser"
+  ],
   "tags": []
 }

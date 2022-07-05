@@ -15,15 +15,24 @@
     "default": {
       "runner": "@nrwl/nx-cloud",
       "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"],
+        "cacheableOperations": [
+          "build",
+          "lint",
+          "test",
+          "e2e"
+        ],
         "accessToken": "ODU1YTg5MzktOWVmNi00MjY1LTgxNGMtMWRmY2IyMTZhN2E3fHJlYWQtd3JpdGU="
       }
     }
   },
   "targetDefaults": {
     "build": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     }
   },
-  "plugins": ["@nxrs/cargo"]
+  "plugins": [
+    "@nxrs/cargo"
+  ]
 }

@@ -3,7 +3,7 @@
 version = 3
 
 [[package]]
-name = "acmi_parser"
+name = "acmi-parser"
 version = "0.1.0"
 dependencies = [
  "zip",

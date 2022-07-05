@@ -9,7 +9,10 @@
         "release": true,
         "target": "wasm32-wasi",
         "lib": true
-      }
+      },
+      "outputs": [
+        "target"
+      ]
     },
     "test": {
       "executor": "@nxrs/cargo:test",
