@@ -1,11 +1,7 @@
 const { spawn } = require('child_process');
 const path = require('path');
 
-export const config = {
-  runtime: 'experimental-edge',
-};
-
-export default function handler(req, res) {
+module.exports = (req, res) => {
   const wasmedge = spawn(path.join(__dirname, 'wasmedge'), [
     path.join(__dirname, 'acmi_parser.so'),
   ]);
@@ -26,4 +22,4 @@ export default function handler(req, res) {
 
   wasmedge.stdin.write(req.body);
   wasmedge.stdin.end('');
-}
+};
