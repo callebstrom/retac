@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nx affected --target=dev",
-    "build": "nx run-many --target=build --projects=api",
+    "build": "nx run-many --target=build --projects=api --verbose",
     "pre-commit": "nx run-many --target=\"prepare\" --projects=api,acmi-parser",
     "test": "nx run-many --target=test --all",
     "prepare": "husky install"
