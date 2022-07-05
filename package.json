@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "nx affected --target=dev",
+    "start": "vercel dev",
     "build": "nx run-many --target=build --projects=api --verbose",
     "pre-commit": "nx run-many --target=prepare --projects=api",
     "test": "nx run-many --target=test --all",

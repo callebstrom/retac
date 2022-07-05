@@ -4,6 +4,7 @@
   "affected": {
     "defaultBase": "master"
   },
+  "defaultProject": "web",
   "implicitDependencies": {
     "package.json": {
       "dependencies": "*",

@@ -2,6 +2,7 @@ const { spawn } = require('child_process');
 const path = require('path');
 
 module.exports = (req, res) => {
+  console.log(req)
   const wasmedge = spawn(path.join(__dirname, 'wasmedge'), [
     path.join(__dirname, 'acmi_parser.so'),
   ]);
