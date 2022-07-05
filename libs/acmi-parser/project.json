@@ -3,6 +3,10 @@
   "projectType": "library",
   "sourceRoot": "libs/acmi-parser/src",
   "targets": {
+    "build": {
+      "executor": "@nxrs/cargo:build",
+      "options": {}
+    },
     "test": {
       "executor": "@nxrs/cargo:test",
       "options": {}
