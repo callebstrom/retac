@@ -15,7 +15,6 @@ pub fn unzip(path: &str) -> Result<String, &str> {
 
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
-    println!("{}", contents);
 
     return Ok(contents);
 }
