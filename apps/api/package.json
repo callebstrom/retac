@@ -4,6 +4,7 @@
     "vercel": "^26.0.0"
   },
   "scripts": {
-    "vercel-build": "./pre.sh"
+    "vercel-build": "./pre.sh",
+    "build": ""
   }
 }
