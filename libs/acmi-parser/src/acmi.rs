@@ -1,36 +1,36 @@
 #[derive(Default)]
 pub struct Coordinates {
-    latitude: f32,
-    longitude: f32,
+    pub latitude: f32,
+    pub longitude: f32,
 }
 
 #[derive(Default)]
 pub struct World {
-    reference_time: i64,
-    reference_coordinates: Coordinates,
+    pub reference_time: i64,
+    pub reference_coordinates: Coordinates,
 }
 
 #[derive(Default)]
 pub struct Flight {
-    id: i8,
+    pub id: i8,
 }
 
 #[derive(Default)]
 pub struct Timeline {
-    timeframes: Vec<Timeframe>,
+    pub timeframes: Vec<Timeframe>,
 }
 
 #[derive(Default)]
 pub struct Timeframe {
-    time: i16,
-    transforms: Vec<Transform>,
+    pub time: i16,
+    pub transforms: Vec<Transform>,
 }
 
 #[derive(Default)]
 pub struct Transform {
-    flight: i8,
-    coordinates: Coordinates,
-    roll: i8,
-    pitch: i8,
-    yaw: i8,
+    pub flight: i8,
+    pub coordinates: Coordinates,
+    pub roll: i8,
+    pub pitch: i8,
+    pub yaw: i8,
 }
