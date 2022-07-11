@@ -45,6 +45,10 @@ impl AcmiFile {
         AcmiFile::is_valid(&raw).map(|()| AcmiFile { raw })
     }
 
+    pub fn raw(&self) -> &String {
+        &self.raw
+    }
+
     fn is_valid(raw: &String) -> Result<(), super::AcmiParseError> {
         if !raw.starts_with("FileType=text/acmi") {
             return Err(super::AcmiParseError::InvalidAcmi);
@@ -52,4 +56,10 @@ impl AcmiFile {
 
         Ok(())
     }
+}
+
+#[derive(PartialEq, Eq)]
+pub struct AttributeEntry {
+    pub id: i8,
+    pub attributes: Vec<(String, String)>,
 }
