@@ -1,4 +1,4 @@
-use std::io::prelude::*;
+use std::io::prelude::Read;
 
 pub fn unzip(path: &str) -> Result<String, &str> {
     let fname = std::path::Path::new(path);
@@ -21,6 +21,7 @@ pub fn unzip(path: &str) -> Result<String, &str> {
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
 
     #[test]
