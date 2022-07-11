@@ -34,3 +34,22 @@ pub struct Transform {
     pub pitch: i8,
     pub yaw: i8,
 }
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct AcmiFile {
+    raw: String,
+}
+
+impl AcmiFile {
+    pub fn try_from(raw: String) -> Result<Self, super::AcmiParseError> {
+        AcmiFile::is_valid(&raw).map(|()| AcmiFile { raw })
+    }
+
+    fn is_valid(raw: &String) -> Result<(), super::AcmiParseError> {
+        if !raw.starts_with("FileType=text/acmi") {
+            return Err(super::AcmiParseError::InvalidAcmi);
+        }
+
+        Ok(())
+    }
+}

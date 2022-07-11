@@ -1,4 +1,4 @@
-use acmi::{Flight, Timeline, World};
+use acmi::{AcmiFile, Flight, Timeline, World};
 
 mod acmi;
 mod zip;
@@ -10,28 +10,11 @@ pub struct Recording {
     pub timeline: Timeline,
 }
 
-struct AcmiFile {
-    raw: String,
-}
-
+#[derive(Debug, PartialEq, Eq)]
 pub enum AcmiParseError {
     InvalidAcmi,
     InvalidZip,
     Empty,
-}
-
-impl AcmiFile {
-    pub fn try_from(raw: String) -> Result<Self, AcmiParseError> {
-        AcmiFile::is_valid(&raw).map(|()| AcmiFile { raw })
-    }
-
-    fn is_valid(raw: &String) -> Result<(), AcmiParseError> {
-        if !raw.starts_with("FileType=text/acmi") {
-            return Err(AcmiParseError::InvalidAcmi);
-        }
-
-        Ok(())
-    }
 }
 
 pub fn parse(file: &str) -> Result<Recording, AcmiParseError> {
@@ -52,5 +35,26 @@ fn parse_acmi(acmi_raw: String) -> Result<Recording, AcmiParseError> {
 fn parse_world(_acmi: AcmiFile) -> World {
     World {
         ..Default::default()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn given_invalid_acmi_should_err() {
+        let invalid_acmi = "FileType=text/html".to_string();
+        assert_eq!(
+            AcmiFile::try_from(invalid_acmi),
+            Err(AcmiParseError::InvalidAcmi)
+        );
+    }
+
+    #[test]
+    fn given_valid_acmi_should_err() {
+        let valid_acmi = "FileType=text/acmi".to_string();
+        assert!(AcmiFile::try_from(valid_acmi).is_ok());
     }
 }
