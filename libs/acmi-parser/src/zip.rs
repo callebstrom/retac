@@ -1,6 +1,11 @@
 use std::io::prelude::Read;
 
-pub fn unzip(path: &str) -> Result<String, String> {
+pub enum ZipError {
+    InvalidZip,
+    NoFilesInArchive,
+}
+
+pub fn unzip(path: &str) -> Result<String, ZipError> {
     let fname = std::path::Path::new(path);
     let zipfile = std::fs::File::open(&fname).unwrap();
 
@@ -9,7 +14,7 @@ pub fn unzip(path: &str) -> Result<String, String> {
     let mut file = match archive.by_index(0) {
         Ok(file) => file,
         Err(..) => {
-            return Err("No files in archive".to_string());
+            return Err(ZipError::InvalidZip);
         }
     };
 
@@ -27,9 +32,7 @@ mod tests {
     #[test]
     fn should_unzip_acmi_file() {
         let file = "F15_SU27_BVR.zip.acmi";
-        let acmi_header = unzip(file)
-            .to_owned()
-            .map_or_else(|e| e.to_string(), |s| s[3..21].to_string());
+        let acmi_header = unzip(file).map_or_else(|_| "".to_string(), |s| s[3..21].to_string());
 
         assert_eq!(acmi_header, "FileType=text/acmi".to_string());
     }
