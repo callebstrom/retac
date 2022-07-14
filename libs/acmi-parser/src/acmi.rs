@@ -1,34 +1,34 @@
 use itertools::Itertools;
 
-#[derive(Default)]
+#[derive(Default, Debug, PartialEq)]
 pub struct Coordinates {
     pub latitude: f32,
     pub longitude: f32,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug, PartialEq)]
 pub struct World {
-    pub reference_time: i64,
+    pub reference_time: String,
     pub reference_coordinates: Coordinates,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug, PartialEq, Eq)]
 pub struct Flight {
     pub id: i8,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug, PartialEq)]
 pub struct Timeline {
     pub timeframes: Vec<Timeframe>,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug, PartialEq)]
 pub struct Timeframe {
     pub time: i16,
     pub transforms: Vec<Transform>,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug, PartialEq)]
 pub struct Transform {
     pub flight: i8,
     pub coordinates: Coordinates,
@@ -50,7 +50,7 @@ pub enum AcmiError {
     Empty,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug, PartialEq)]
 pub struct Recording {
     pub world: World,
     pub flights: Vec<Flight>,
@@ -62,20 +62,29 @@ impl AcmiFile {
         AcmiFile::is_valid(&raw).map(|()| AcmiFile { raw })
     }
 
-    pub fn raw(&self) -> &String {
+    pub fn raw(&self) -> &str {
         &self.raw
     }
 
     fn is_valid(raw: &String) -> Result<(), AcmiError> {
-        if !raw.starts_with("FileType=text/acmi") {
-            return Err(AcmiError::InvalidAcmi);
-        }
+        let with_magic_bytes = raw
+            .get(3..21)
+            .and_then(
+                |file_type| match file_type.starts_with("FileType=text/acmi") {
+                    true => Some(()),
+                    false => None,
+                },
+            )
+            .map_or(Err(AcmiError::InvalidAcmi), |_| Ok(()));
 
-        Ok(())
+        with_magic_bytes.or_else(|_| match raw.starts_with("FileType=text/acmi") {
+            true => Ok(()),
+            false => Err(AcmiError::InvalidAcmi),
+        })
     }
 }
 
-pub fn parse_attributes(line: String) -> Result<AttributeEntry, AcmiError> {
+pub fn parse_attributes(line: &str) -> Result<AttributeEntry, AcmiError> {
     let mut raw_attributes = line.split(",");
 
     let maybe_id = raw_attributes
@@ -95,11 +104,46 @@ pub fn parse_attributes(line: String) -> Result<AttributeEntry, AcmiError> {
         .ok_or_else(|| AcmiError::InvalidAttributEntry)
 }
 
-pub fn parse_acmi(acmi_raw: String) -> Result<Recording, AcmiError> {
-    AcmiFile::try_from(acmi_raw).map(|acmi| -> Recording {
-        Recording {
-            ..Default::default()
+fn parse_world_attribute(line: &str, recording: &mut Recording) -> () {
+    let world_attribute_entry =
+        parse_attributes(line).map_or(vec![], |attribute_entry| attribute_entry.attributes);
+
+    for (key, value) in world_attribute_entry {
+        match key.as_str() {
+            "ReferenceTime" => recording.world.reference_time = value,
+            "ReferenceLongitude" => {
+                recording.world.reference_coordinates = Coordinates {
+                    latitude: recording.world.reference_coordinates.latitude,
+                    longitude: value.parse::<f32>().unwrap(),
+                }
+            }
+            "ReferenceLatitude" => {
+                recording.world.reference_coordinates = Coordinates {
+                    latitude: value.parse::<f32>().unwrap(),
+                    longitude: recording.world.reference_coordinates.longitude,
+                }
+            }
+            _ => {}
         }
+    }
+}
+
+pub fn parse_acmi(acmi_raw: String) -> Result<Recording, AcmiError> {
+    AcmiFile::try_from(acmi_raw).map(|acmi| -> _ {
+        acmi.raw().lines().fold(
+            Recording {
+                ..Default::default()
+            },
+            |mut recording, line| -> Recording {
+                if line.starts_with("0,") {
+                    parse_world_attribute(line, &mut recording);
+                } else if line.starts_with(r"^([0-9])+,") {
+                    let _b = parse_attributes(line);
+                }
+
+                recording
+            },
+        )
     })
 }
 
@@ -127,7 +171,7 @@ mod tests {
         )
         .to_string();
 
-        let actual = parse_attributes(given_line).unwrap();
+        let actual = parse_attributes(&given_line).unwrap();
         let expected = AttributeEntry {
             id: 102,
             attributes: vec![(given_attribute_name, given_attribute_value)],

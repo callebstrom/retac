@@ -3,13 +3,27 @@ use acmi::{parse_acmi, AcmiError, Recording};
 mod acmi;
 mod zip;
 
-enum Error {
+#[derive(Debug)]
+pub enum Error {
     AcmiError(AcmiError),
     ZipError(zip::ZipError),
 }
 
-pub fn parse(file: &str) -> () {
-    let content = zip::unzip(file)
+pub fn parse(file: &str) -> Result<Recording, Error> {
+    zip::unzip(file)
         .map_err(|e| Error::ZipError(e))
-        .and_then(parse_acmi);
+        .and_then(|content| parse_acmi(content).map_err(|e| Error::AcmiError(e)))
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn given_valid_acmi_zip_should_parse_world_attributes() {
+        let recording = parse("F15_SU27_BVR.zip.acmi").unwrap();
+        assert_eq!(recording.world.reference_coordinates.latitude, 36.0);
+        assert_eq!(recording.world.reference_coordinates.longitude, 37.0);
+    }
 }

@@ -1,5 +1,6 @@
 use std::io::prelude::Read;
 
+#[derive(Debug)]
 pub enum ZipError {
     InvalidZip,
     NoFilesInArchive,
@@ -9,19 +10,19 @@ pub fn unzip(path: &str) -> Result<String, ZipError> {
     let fname = std::path::Path::new(path);
     let zipfile = std::fs::File::open(&fname).unwrap();
 
-    let mut archive = zip::ZipArchive::new(zipfile).unwrap();
-
-    let mut file = match archive.by_index(0) {
-        Ok(file) => file,
-        Err(..) => {
-            return Err(ZipError::InvalidZip);
-        }
-    };
-
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-
-    return Ok(contents);
+    zip::ZipArchive::new(zipfile)
+        .map_err(|_| ZipError::InvalidZip)
+        .and_then(|mut archive| {
+            archive
+                .by_index(0)
+                .map_err(|_| ZipError::NoFilesInArchive)
+                .and_then(|mut file| -> _ {
+                    let mut contents = String::new();
+                    file.read_to_string(&mut contents)
+                        .map(|_| contents)
+                        .map_err(|_| ZipError::InvalidZip)
+                })
+        })
 }
 
 #[cfg(test)]
