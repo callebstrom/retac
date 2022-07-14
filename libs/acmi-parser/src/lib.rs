@@ -3,7 +3,7 @@ use acmi::{parse_acmi, AcmiError, Recording};
 mod acmi;
 mod zip;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Error {
     AcmiError(AcmiError),
     ZipError(zip::ZipError),
@@ -25,5 +25,11 @@ mod tests {
         let recording = parse("F15_SU27_BVR.zip.acmi").unwrap();
         assert_eq!(recording.world.reference_coordinates.latitude, 36.0);
         assert_eq!(recording.world.reference_coordinates.longitude, 37.0);
+    }
+
+    #[test]
+    fn given_non_existing_zip_should_err() {
+        let result = parse("some_non_existing_file.zip");
+        assert_eq!(result, Err(Error::ZipError(zip::ZipError::InvalidZip)))
     }
 }

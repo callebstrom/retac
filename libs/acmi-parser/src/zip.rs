@@ -1,17 +1,15 @@
-use std::io::prelude::Read;
+use std::io::Read;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum ZipError {
     InvalidZip,
     NoFilesInArchive,
 }
 
 pub fn unzip(path: &str) -> Result<String, ZipError> {
-    let fname = std::path::Path::new(path);
-    let zipfile = std::fs::File::open(&fname).unwrap();
-
-    zip::ZipArchive::new(zipfile)
+    std::fs::File::open(std::path::Path::new(path))
         .map_err(|_| ZipError::InvalidZip)
+        .and_then(|zip_file| zip::ZipArchive::new(zip_file).map_err(|_| ZipError::InvalidZip))
         .and_then(|mut archive| {
             archive
                 .by_index(0)
