@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 zip = { version = "0.6.2", default-features = false, features = [ "deflate" ]}
 itertools = "0.10.2"
+regex = "1.5"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

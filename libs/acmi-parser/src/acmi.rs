@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use regex::Regex;
 
 #[derive(Default, Debug, PartialEq)]
 pub struct Coordinates {
@@ -24,7 +25,7 @@ pub struct Timeline {
 
 #[derive(Default, Debug, PartialEq)]
 pub struct Timeframe {
-    pub time: i16,
+    pub time: f64,
     pub transforms: Vec<Transform>,
 }
 
@@ -128,6 +129,34 @@ fn parse_world_attribute(line: &str, recording: &mut Recording) -> () {
     }
 }
 
+fn parse_flight_attribute(line: &str, recording: &mut Recording) -> () {
+    for AttributeEntry { id, attributes } in parse_attributes(line) {
+        if (recording.flights.contains(&Flight { id })) {}
+    }
+}
+
+fn parse_timeline_marker(line: &str, recording: &mut Recording) -> () {
+    let timeframe = Regex::new(r"^#([0-9]+\.[0-9]+)$")
+        .unwrap()
+        .captures(line)
+        .and_then(|captures| captures.get(1))
+        .map(|capture| capture.as_str())
+        .and_then(|capture| {
+            capture
+                .parse::<f64>()
+                .map(|timestamp| Some(timestamp))
+                .unwrap_or(None)
+        })
+        .map(|time| Timeframe {
+            time,
+            transforms: vec![],
+        });
+
+    if timeframe.is_some() {
+        recording.timeline.timeframes.push(timeframe.unwrap());
+    }
+}
+
 pub fn parse_acmi(acmi_raw: String) -> Result<Recording, AcmiError> {
     AcmiFile::try_from(acmi_raw).map(|acmi| -> _ {
         acmi.raw().lines().fold(
@@ -137,8 +166,11 @@ pub fn parse_acmi(acmi_raw: String) -> Result<Recording, AcmiError> {
             |mut recording, line| -> Recording {
                 if line.starts_with("0,") {
                     parse_world_attribute(line, &mut recording);
-                } else if line.starts_with(r"^([0-9])+,") {
-                    let _b = parse_attributes(line);
+                } else if line.starts_with("#") {
+                    parse_timeline_marker(line, &mut recording);
+                }
+                if Regex::new(r"^([0-9])+,").unwrap().captures(line).is_some() {
+                    parse_flight_attribute(line, &mut recording);
                 }
 
                 recording
@@ -193,5 +225,12 @@ mod tests {
     fn given_valid_acmi_should_err() {
         let valid_acmi = "FileType=text/acmi".to_string();
         assert!(AcmiFile::try_from(valid_acmi).is_ok());
+    }
+
+    #[test]
+    fn given_acmi_with_time_markers_should_contain_timeframe() {
+        let recording = parse_acmi("FileType=text/acmi\n#0.3".to_string()).unwrap();
+        let actual_timeframe = recording.timeline.timeframes.get(0).unwrap().time;
+        assert_eq!(actual_timeframe, 0.3);
     }
 }
