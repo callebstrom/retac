@@ -13,6 +13,15 @@ pub struct World {
     pub reference_coordinates: Coordinates,
 }
 
+#[derive(Default, Debug, PartialEq)]
+pub struct StaticObject {
+    pub id: i8,
+    pub color: Option<String>,
+    pub coalition: Option<String>,
+    pub r#type: Option<String>,
+    pub coordinates: Option<Coordinates>,
+}
+
 #[derive(Default, Debug, PartialEq, Eq)]
 pub struct Flight {
     pub id: i8,
@@ -55,6 +64,7 @@ pub enum AcmiError {
 pub struct Recording {
     pub world: World,
     pub flights: Vec<Flight>,
+    pub static_objects: Vec<StaticObject>,
     pub timeline: Timeline,
 }
 
@@ -131,8 +141,44 @@ fn parse_world_attribute(line: &str, recording: &mut Recording) -> () {
 
 fn parse_flight_attribute(line: &str, recording: &mut Recording) -> () {
     for AttributeEntry { id, attributes } in parse_attributes(line) {
-        if (recording.flights.contains(&Flight { id })) {}
+        if recording.flights.contains(&Flight { id }) {}
     }
+}
+
+fn parse_coordinates(coordinates: &str) -> Coordinates {
+    todo!("Actually parse coordinates");
+    Coordinates {
+        latitude: 1.0,
+        longitude: 1.0,
+    }
+}
+
+fn parse_static_objects(line: &str, recording: &mut Recording) -> () {
+    let static_object = parse_attributes(line)
+        .map(|attribute_entry| StaticObject {
+            id: attribute_entry.id,
+            ..attribute_entry.attributes.iter().fold(
+                StaticObject {
+                    ..Default::default()
+                },
+                |mut static_object, (attribute, value)| -> StaticObject {
+                    let attribute_name = attribute.as_str();
+                    if attribute_name == "Type" {
+                        static_object.r#type = Some(value.to_string());
+                    } else if attribute_name == "Coalition" {
+                        static_object.coalition = Some(value.to_string());
+                    } else if attribute_name == "Color" {
+                        static_object.color = Some(value.to_string());
+                    } else if attribute_name == "Color" {
+                        static_object.coordinates = Some(parse_coordinates(&value));
+                    }
+
+                    static_object
+                },
+            )
+        })
+        .unwrap();
+    recording.static_objects.push(static_object);
 }
 
 fn parse_timeline_marker(line: &str, recording: &mut Recording) -> () {
@@ -164,12 +210,16 @@ pub fn parse_acmi(acmi_raw: String) -> Result<Recording, AcmiError> {
                 ..Default::default()
             },
             |mut recording, line| -> Recording {
+                let is_timeline_empty = recording.timeline.timeframes.len() == 0;
+                let has_id = Regex::new(r"^([0-9])+,").unwrap().captures(line).is_some();
+
                 if line.starts_with("0,") {
                     parse_world_attribute(line, &mut recording);
                 } else if line.starts_with("#") {
                     parse_timeline_marker(line, &mut recording);
-                }
-                if Regex::new(r"^([0-9])+,").unwrap().captures(line).is_some() {
+                } else if has_id && is_timeline_empty {
+                    parse_static_objects(line, &mut recording);
+                } else if has_id {
                     parse_flight_attribute(line, &mut recording);
                 }
 
@@ -232,5 +282,23 @@ mod tests {
         let recording = parse_acmi("FileType=text/acmi\n#0.3".to_string()).unwrap();
         let actual_timeframe = recording.timeline.timeframes.get(0).unwrap().time;
         assert_eq!(actual_timeframe, 0.3);
+    }
+
+    #[test]
+    fn given_acmi_with_no_time_markers_should_assume_static_objects() {
+        let expected_type = "Navaid+Static+Bullseye";
+        let recording =
+            parse_acmi(format!("FileType=text/acmi\n123,Type={}", expected_type).to_string())
+                .unwrap();
+
+        let actual_type = recording
+            .static_objects
+            .get(0)
+            .unwrap()
+            .r#type
+            .as_ref()
+            .unwrap();
+
+        assert_eq!(actual_type, expected_type);
     }
 }
